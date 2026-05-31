@@ -102,7 +102,6 @@ const AnalysePanel: React.FC<AnalysePanelProps> = ({ result, loading, agentStep,
             {AGENTS.map((agent, i) => {
               const done    = i < agentStep;
               const active  = i === agentStep - 1;
-              const pending = i >= agentStep;
               const color   = done ? '#00ff9d' : active ? '#00c8ff' : 'rgba(255,255,255,0.2)';
               return (
                 <div key={i} style={{ animation: `fadeIn 0.4s ease ${i * 0.1}s both` }}>
