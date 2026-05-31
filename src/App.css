@@ -1,38 +1,87 @@
-.App {
-  text-align: center;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+body {
+  background: #000510;
+  color: #ffffff;
+  overflow-x: hidden;
+  font-family: 'Share Tech Mono', monospace;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: #000510; }
+::-webkit-scrollbar-thumb { background: rgba(0,255,157,0.3); border-radius: 2px; }
+
+select option {
+  background: #000510;
+  color: #00ff9d;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+input:focus {
+  border-color: #00ff9d !important;
+  box-shadow: 0 0 15px rgba(0,255,157,0.3) !important;
+  outline: none;
 }
 
-.App-link {
-  color: #61dafb;
+button:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(0,255,157,0.3), rgba(0,200,255,0.3)) !important;
+  box-shadow: 0 0 25px rgba(0,255,157,0.5) !important;
+  transform: translateY(-2px) !important;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+@keyframes gradientShift {
+  0%   { background-position: 0%; }
+  50%  { background-position: 100%; }
+  100% { background-position: 0%; }
+}
+
+@keyframes btnPulse {
+  0%,100% { box-shadow: 0 0 10px rgba(0,255,157,0.3); }
+  50%      { box-shadow: 0 0 30px rgba(0,255,157,0.8), 0 0 60px rgba(0,255,157,0.3); }
+}
+
+@keyframes flyIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateX(-10px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes recPulse {
+  0%,100% { filter: brightness(1); }
+  50%      { filter: brightness(1.4); }
+}
+
+@keyframes scanLine {
+  0%   { left: -100%; }
+  100% { left: 200%; }
+}
+
+@keyframes livePulse {
+  0%,100% { opacity: 1; box-shadow: 0 0 10px #00ff9d; }
+  50%      { opacity: 0.3; box-shadow: none; }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-15px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes ticker {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
