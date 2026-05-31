@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SpaceBackground from './components/SpaceBackground';
 import Hero from './components/Hero';
 import TickerTape from './components/TickerTape';
@@ -7,69 +7,49 @@ import NewsPanel from './components/NewsPanel';
 import SignalFeed from './components/SignalFeed';
 import './App.css';
 
+const API = 'https://web-production-353e6.up.railway.app';
+
 const App: React.FC = () => {
-  const [ticker, setTicker] = useState('NVDA');
-  const [market, setMarket] = useState('US');
-  const [result, setResult] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
-  const [agentStep, setAgentStep] = useState(0);
+  const [ticker, setTicker]         = useState('NVDA');
+  const [market, setMarket]         = useState('US');
+  const [result, setResult]         = useState<any>(null);
+  const [loading, setLoading]       = useState(false);
+  const [agentStep, setAgentStep]   = useState(0);
   const [generalNews, setGeneralNews] = useState<any[]>([]);
-  const [stockNews, setStockNews] = useState<any[]>([]);
+  const [stockNews, setStockNews]   = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch(`${API}/news/general`)
+      .then(r => r.json())
+      .then(d => setGeneralNews(d.news || []))
+      .catch(() => {});
+  }, []);
 
   const handleAnalyse = async () => {
     setLoading(true);
-    setAgentStep(1);
+    setAgentStep(0);
     setResult(null);
 
-    // Simulate agent steps
     for (let i = 1; i <= 6; i++) {
       setAgentStep(i);
-      await new Promise(r => setTimeout(r, 800));
+      await new Promise(r => setTimeout(r, 600));
     }
 
-    // Mock result
-    setResult({
-      ticker,
-      market,
-      financial_data: {
-        current_price: '$214.25',
-        change_percent: '+0.51%',
-        '52w_high': '$236.54',
-        '52w_low': '$132.92',
-        day_high: '$215.19',
-        day_low: '$211.22',
-        volume: 141557394,
-        company_name: 'NVIDIA Corporation',
-      },
-      sentiment: {
-        sentiment: 'Bullish',
-        score: 0.8,
-        summary: 'Strong earnings and revenue growth outlook',
-      },
-      report: {
-        recommendation: 'BUY',
-        confidence: 'HIGH',
-        target_price: '284',
-        reasoning: 'Consistent increase in stock price with strong AI market position.',
-        news_summary: 'Positive outlook with analysts expecting continued success.',
-        risks: ['Market volatility', 'Regulatory concerns', 'Competition'],
-      },
-      rag_context: {
-        total_stored: 1247,
-        freshly_stored: 12,
-      },
-    });
+    try {
+      const res = await fetch(`${API}/analyse`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ticker, market }),
+      });
+      const data = await res.json();
+      setResult(data);
 
-    setGeneralNews([
-      { title: 'Global markets rally in 2026 outlook', source: 'Reuters', url: '#' },
-      { title: 'Fed signals rate cuts ahead', source: 'Bloomberg', url: '#' },
-      { title: 'AI boom drives tech valuations', source: 'CNBC', url: '#' },
-    ]);
-    setStockNews([
-      { title: `${ticker} reports strong quarterly earnings`, source: 'Reuters', url: '#' },
-      { title: `Analysts raise ${ticker} price target`, source: 'Bloomberg', url: '#' },
-      { title: `${ticker} dominates AI chip market`, source: 'CNBC', url: '#' },
-    ]);
+      const sn = await fetch(`${API}/news/${ticker}`);
+      const snData = await sn.json();
+      setStockNews(snData.news || []);
+    } catch (e) {
+      console.error(e);
+    }
 
     setLoading(false);
   };
@@ -105,7 +85,7 @@ const App: React.FC = () => {
           fontSize: '0.6rem',
           color: 'rgba(0,255,157,0.3)',
         }}>
-          LANGGRAPH · GROQ · TAVILY · REAL-TIME DATA · AI TRADING INTELLIGENCE
+          ⬡ FINAGENT GLOBAL · LANGGRAPH · GROQ · TAVILY · CHROMADB · RAG · NOT FINANCIAL ADVICE ⬡
         </div>
       </div>
     </>
