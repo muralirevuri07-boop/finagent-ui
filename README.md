@@ -145,6 +145,6 @@ ALPHA_VANTAGE_API_KEY=
 
 <div align="center">
 
-⬡ Built for London · LangGraph · Groq · RAG · Not Financial Advice ⬡
+⬡ LangGraph · Groq · RAG · Not Financial Advice ⬡
 
 </div>
