@@ -1,46 +1,150 @@
-# Getting Started with Create React App
+<div align="center">
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# ⬡ FINAGENT GLOBAL
+### AI Trading War Room — Multi-Agent Global Market Intelligence
 
-## Available Scripts
+[![Live Demo](https://img.shields.io/badge/🚀_LIVE_DEMO-finagent--ui.vercel.app-00ff9d?style=for-the-badge)](https://finagent-ui.vercel.app)
+[![Backend](https://img.shields.io/badge/API-Railway-blueviolet?style=for-the-badge)](https://web-production-353e6.up.railway.app/health)
+[![GitHub](https://img.shields.io/badge/Backend-GitHub-181717?style=for-the-badge&logo=github)](https://github.com/muralirevuri07-boop/finagent)
 
-In the project directory, you can run:
+![FinAgent Global](https://finagent-ui.vercel.app/og-image.png)
 
-### `npm start`
+</div>
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+---
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## 🌍 Live Demo
 
-### `npm test`
+👉 **[https://finagent-ui.vercel.app](https://finagent-ui.vercel.app)**
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Type any ticker → Select market → Click ⚡ ANALYSE MARKET
 
-### `npm run build`
+---
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 🤖 What is FinAgent Global?
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+FinAgent Global is a **production-grade AI trading platform** built with a multi-agent architecture. It analyses stocks, crypto, forex and commodities across 11 global markets using 8 specialized AI agents working in orchestrated pipelines.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+This is not a dashboard. This is an **AI command center**.
 
-### `npm run eject`
+---
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## ⚡ Tech Stack
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+| Layer | Technology |
+|---|---|
+| **AI Orchestration** | LangGraph · LangChain · LangSmith |
+| **LLM Inference** | Groq (Llama 3.3 70B) — fastest LLM |
+| **RAG Pipeline** | ChromaDB · HuggingFace Embeddings |
+| **News Intelligence** | Tavily Real-time Search API |
+| **Market Data** | Yahoo Finance · Alpha Vantage |
+| **Backend** | FastAPI · Python 3.11 · Uvicorn |
+| **Frontend** | React · TypeScript · Three.js |
+| **3D Graphics** | Canvas API · WebGL · Holographic Globe |
+| **Deployment** | Vercel (Frontend) · Railway (Backend) |
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+---
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## 🤖 8 AI Agents
 
-## Learn More
+📰 News Agent        — Tavily real-time news scraping
+🧠 RAG Agent         — ChromaDB vector memory & retrieval
+📊 Financial Agent   — Live price, OHLC, volume data
+💭 Sentiment Agent   — Groq LLM sentiment analysis
+📋 Report Agent      — BUY/HOLD/SELL with RAG context
+😨 Fear & Greed      — VIX + SP500 + BTC index
+⚔️ Comparison Agent  — Multi-stock battle analysis
+📁 Portfolio Agent   — Portfolio risk scoring
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+---
+
+## 🌍 11 Global Markets
+🇺🇸 US Stocks     NYSE + NASDAQ
+🇮🇳 India NSE     National Stock Exchange
+🇮🇳 India BSE     Bombay Stock Exchange
+🇬🇧 London LSE    London Stock Exchange
+🇩🇪 Frankfurt     XETRA
+🇯🇵 Tokyo         TSE
+🇭🇰 Hong Kong     HKEX
+🇸🇬 Singapore     SGX
+₿  Crypto         BTC, ETH, SOL, BNB
+💱 Forex          GBP/USD, EUR/USD, USD/INR
+🏅 Commodities    Gold, Oil, Silver, Gas
+
+---
+
+## 📡 API Endpoints
+POST /analyse          — Full 5-agent pipeline
+POST /compare          — Multi-stock battle
+POST /portfolio        — Portfolio analysis
+GET  /feargreed        — Fear & Greed index
+GET  /news/general     — Live global news
+GET  /news/{ticker}    — Stock-specific news
+GET  /rag/stats/{ticker} — Vector DB stats
+GET  /health           — API health check
+
+---
+
+## ✨ Features
+
+- 🔮 **Holographic rotating globe** — Three.js WebGL
+- 🌌 **Animated space background** — Parallax stars + nebula
+- 📺 **Bloomberg-style ticker tape** — Live scrolling prices
+- ⚡ **Live AI signals feed** — Real-time animated signals
+- 🧠 **RAG Memory** — Stores & retrieves past analyses
+- 📰 **Live news panel** — Reuters, Bloomberg, CNBC
+- 📊 **3 chart types** — Line, Candlestick, Volume
+- 📄 **Export report** — Download AI analysis
+- 🎨 **Dynamic themes** — Green/Red/Gold based on BUY/SELL/HOLD
+
+---
+
+## 🚀 Run Locally
+
+```bash
+# Backend
+git clone https://github.com/muralirevuri07-boop/finagent
+cd finagent
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+# Add .env with API keys
+uvicorn api.main:app --reload
+
+# Frontend
+git clone https://github.com/muralirevuri07-boop/finagent-ui
+cd finagent-ui
+npm install --legacy-peer-deps
+npm start
+```
+
+---
+
+## 🔑 Environment Variables
+
+```env
+GROQ_API_KEY=
+TAVILY_API_KEY=
+LANGSMITH_API_KEY=
+LANGCHAIN_TRACING_V2=true
+LANGCHAIN_PROJECT=FinAgent
+ALPHA_VANTAGE_API_KEY=
+```
+
+---
+
+## 👨‍💻 Built By
+
+**Murali Revuri** — Full-Stack AI Engineer
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0077B5?style=for-the-badge&logo=linkedin)](https://linkedin.com/in/yourprofile)
+[![GitHub](https://img.shields.io/badge/GitHub-Follow-181717?style=for-the-badge&logo=github)](https://github.com/muralirevuri07-boop)
+
+---
+
+<div align="center">
+
+⬡ Built for London · LangGraph · Groq · RAG · Not Financial Advice ⬡
+
+</div>
