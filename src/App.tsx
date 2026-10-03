@@ -7,7 +7,7 @@ import NewsPanel from './components/NewsPanel';
 import SignalFeed from './components/SignalFeed';
 import './App.css';
 
-const API = 'https://web-production-353e6.up.railway.app';
+const API = 'https://finagent-api-k9em.onrender.com';
 
 const App: React.FC = () => {
   const [ticker, setTicker]         = useState('NVDA');
