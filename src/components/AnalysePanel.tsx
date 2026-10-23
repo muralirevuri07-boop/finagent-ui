@@ -1,5 +1,6 @@
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { jsPDF } from 'jspdf';
 
 interface AnalysePanelProps {
   result: any;
@@ -203,6 +204,7 @@ const AnalysePanel: React.FC<AnalysePanelProps> = ({ result, loading, agentStep,
   const fin       = result.financial_data || {};
   const rag       = result.rag_context    || {};
   const valuation = result.valuation      || {};
+  const signal    = result.signal         || {};
   const rec       = report.recommendation || 'N/A';
   const currency  = fin.currency || '$';
   const recColor  = rec === 'BUY' ? '#00ff9d' : rec === 'SELL' ? '#ff0066' : '#ffaa00';
@@ -234,12 +236,13 @@ const AnalysePanel: React.FC<AnalysePanelProps> = ({ result, loading, agentStep,
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 
       {/* TOP METRICS */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.8rem' }}>
-        <MetricCard label="Recommendation" value={rec}                          color={recColor}  big />
-        <MetricCard label="Confidence"     value={report.confidence || 'N/A'}   color="#00c8ff" />
-        <MetricCard label="Sentiment"      value={sentiment.sentiment || 'N/A'} color={sentColor} />
-        <MetricCard label="Live Price"     value={fin.current_price  || 'N/A'}  color="#00ff9d" />
-        <MetricCard label="24H Change"     value={fin.change_percent || 'N/A'}  color={(fin.change_percent || '').includes('-') ? '#ff0066' : '#00ff9d'} />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '0.8rem' }}>
+        <MetricCard label="Recommendation" value={rec}                                                         color={recColor}  big />
+        <MetricCard label="Signal Score"   value={signal.score != null ? `${signal.score}/100` : 'N/A'}        color={signal.tier === 'strong_buy' || signal.tier === 'buy' ? '#00ff9d' : signal.tier === 'strong_sell' || signal.tier === 'sell' ? '#ff0066' : '#ffaa00'} />
+        <MetricCard label="Confidence"     value={report.confidence || 'N/A'}                                  color="#00c8ff" />
+        <MetricCard label="Sentiment"      value={sentiment.sentiment || 'N/A'}                                color={sentColor} />
+        <MetricCard label="Live Price"     value={fin.current_price  || 'N/A'}                                 color="#00ff9d" />
+        <MetricCard label="24H Change"     value={fin.change_percent || 'N/A'}                                 color={(fin.change_percent || '').includes('-') ? '#ff0066' : '#00ff9d'} />
       </div>
 
       {/* DCF VALUATION */}
@@ -467,7 +470,157 @@ const AnalysePanel: React.FC<AnalysePanelProps> = ({ result, loading, agentStep,
         </div>
       </Panel>
 
-      {/* EXPORT */}
+      {/* EXPORT BUTTONS */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+
+      {/* PDF export */}
+      <button
+        onClick={() => {
+          const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+          const W = 210; const margin = 14; const col = W - margin * 2;
+          let y = 0;
+
+          const addPage = () => { doc.addPage(); y = 14; };
+          const checkY = (need: number) => { if (y + need > 280) addPage(); };
+
+          // ── Header bar ──
+          doc.setFillColor(0, 5, 20);
+          doc.rect(0, 0, W, 28, 'F');
+          doc.setTextColor(0, 255, 157);
+          doc.setFontSize(16);
+          doc.setFont('helvetica', 'bold');
+          doc.text('FINAGENT GLOBAL', margin, 11);
+          doc.setFontSize(8);
+          doc.setTextColor(0, 200, 255);
+          doc.text('AI-POWERED MARKET ANALYSIS REPORT', margin, 18);
+          doc.setTextColor(120, 120, 140);
+          doc.setFont('helvetica', 'normal');
+          doc.text(`${fin.company_name || ticker}  ·  ${fin.market_label || result.market}  ·  ${new Date().toUTCString()}`, margin, 24);
+          y = 36;
+
+          // ── Section helper ──
+          const section = (title: string) => {
+            checkY(14);
+            doc.setFillColor(0, 20, 45);
+            doc.rect(margin, y - 4, col, 9, 'F');
+            doc.setTextColor(0, 255, 157);
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'bold');
+            doc.text(title, margin + 2, y + 2);
+            y += 10;
+          };
+
+          const row = (label: string, value: string, accent?: [number,number,number]) => {
+            checkY(7);
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(100, 140, 120);
+            doc.text(label, margin + 2, y);
+            doc.setTextColor(...(accent || [220, 220, 240] as [number,number,number]));
+            doc.text(String(value), margin + 65, y);
+            y += 6;
+          };
+
+          const body = (text: string, color?: [number,number,number]) => {
+            const lines = doc.splitTextToSize(text || 'N/A', col - 4);
+            lines.forEach((line: string) => {
+              checkY(6);
+              doc.setFontSize(8);
+              doc.setFont('helvetica', 'normal');
+              doc.setTextColor(...(color || [200, 210, 230] as [number,number,number]));
+              doc.text(line, margin + 2, y);
+              y += 5.5;
+            });
+            y += 2;
+          };
+
+          // ── Recommendation ──
+          section('RECOMMENDATION');
+          const recRGB: [number,number,number] = rec === 'BUY' ? [0,255,157] : rec === 'SELL' ? [255,0,102] : [255,170,0];
+          row('Signal',     rec,                         recRGB);
+          row('Confidence', report.confidence || 'N/A');
+          row('Signal Score', `${result.signal?.score ?? report.signal_score ?? 'N/A'}/100`);
+          row('Score Breakdown', result.signal?.explanation || report.signal_explanation || 'N/A');
+          row('Sentiment',  `${sentiment.sentiment || 'N/A'} (${((sentiment.score||0)*100).toFixed(0)}%)`);
+
+          // ── Price ──
+          section('PRICE & MARKET DATA');
+          row('Current Price', fin.current_price || 'N/A', [0,255,157]);
+          row('24H Change',    fin.change_percent || 'N/A');
+          row('52W High',      fin['52w_high'] || 'N/A');
+          row('52W Low',       fin['52w_low']  || 'N/A');
+          row('Beta',          String(fin.beta  || 'N/A'));
+          row('Sector',        fin.sector   || 'N/A');
+          row('Industry',      fin.industry || 'N/A');
+
+          // ── Valuation ──
+          section(`VALUATION  (${valMethod} · ${valHorizon})`);
+          if (valAvailable) {
+            row('Bear Case', fmtVal(valBear), [255,100,70]);
+            row('Base Case', fmtVal(valBase), [0,200,255]);
+            row('Bull Case', fmtVal(valBull), [0,255,157]);
+            row('Upside to Base', valUpside, upsideNum > 0 ? [0,255,157] : [255,0,102]);
+            Object.entries(valAssumptions).forEach(([k,v]) => row(k.replace(/_/g,' '), String(v)));
+          } else {
+            row('Status', valUnavailReason || 'Unavailable', [255,170,0]);
+          }
+
+          // ── Fundamentals ──
+          section('FUNDAMENTALS');
+          row('Market Cap',    fin.market_cap        || 'N/A');
+          row('P/E (TTM)',     String(fin.pe_ratio   || 'N/A'));
+          row('Fwd P/E',      String(fin.forward_pe || 'N/A'));
+          row('EPS (TTM)',     String(fin.eps_ttm    || 'N/A'));
+          row('Revenue TTM',  fin.revenue_ttm       || 'N/A');
+          row('Gross Margin', fin.gross_margin      || 'N/A', [0,255,157]);
+          row('Op Margin',    fin.operating_margin  || 'N/A', [0,200,255]);
+          row('Net Margin',   fin.net_margin        || 'N/A', [0,200,255]);
+          row('Free CF',      fin.free_cashflow     || 'N/A', [0,255,157]);
+          row('Total Cash',   fin.total_cash        || 'N/A');
+          row('Total Debt',   fin.total_debt        || 'N/A', [255,100,70]);
+
+          // ── Analysis ──
+          section('AI ANALYSIS');
+          body(report.reasoning || 'N/A');
+
+          section('NEWS SUMMARY');
+          body(report.news_summary || 'N/A');
+
+          section('RISK VECTORS');
+          (report.risks || []).forEach((r: string) => body(`• ${r}`, [255,100,120]));
+
+          // ── Footer ──
+          const pages = (doc as any).internal.getNumberOfPages();
+          for (let i = 1; i <= pages; i++) {
+            doc.setPage(i);
+            doc.setFontSize(7);
+            doc.setTextColor(80, 90, 110);
+            doc.text('NOT FINANCIAL ADVICE — For informational purposes only. Generated by FinAgent Global · finagent-ui.vercel.app', margin, 292);
+            doc.text(`Page ${i}/${pages}`, W - margin - 10, 292);
+          }
+
+          doc.save(`finagent_${ticker}_${Date.now()}.pdf`);
+        }}
+        style={{
+          background: 'linear-gradient(135deg, rgba(255,0,102,0.08), rgba(255,100,70,0.08))',
+          border: '1px solid rgba(255,100,70,0.4)',
+          borderRadius: '8px',
+          color: '#ff6644',
+          fontFamily: "'Orbitron',monospace",
+          fontSize: '0.75rem',
+          letterSpacing: '2px',
+          padding: '0.8rem',
+          cursor: 'pointer',
+          width: '100%',
+          transition: 'all 0.3s',
+        }}
+        onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 0 20px rgba(255,100,70,0.4)')}
+        onMouseLeave={e => (e.currentTarget.style.boxShadow = 'none')}
+      >
+        📑 EXPORT PDF REPORT
+      </button>
+
+      {/* TXT export */}
       <button
         onClick={() => {
           const sep  = '='.repeat(60);
@@ -560,8 +713,10 @@ const AnalysePanel: React.FC<AnalysePanelProps> = ({ result, loading, agentStep,
         onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 0 20px rgba(0,255,157,0.4)')}
         onMouseLeave={e => (e.currentTarget.style.boxShadow = 'none')}
       >
-        📄 EXPORT FULL REPORT (.TXT)
+        📄 EXPORT REPORT (.TXT)
       </button>
+
+      </div>{/* end export grid */}
 
     </div>
   );
