@@ -286,8 +286,24 @@ const CopilotPanel: React.FC<Props> = ({ ticker, market }) => {
     setOpenSourceId(prev => prev === id ? null : id);
   }, []);
 
+  const GREETINGS = /^(hey|hi|hello|yo|sup|hiya|howdy|helo|heya)[!?.,\s]*$/i;
+  const CHIT_CHAT = /^(how are you|what's up|whats up|what can you do|who are you|help)[?!.,\s]*$/i;
+
   const ask = async () => {
     if (!question.trim() || loading) return;
+
+    // Catch greetings / chit-chat — no need to hit the pipeline
+    if (GREETINGS.test(question.trim()) || CHIT_CHAT.test(question.trim())) {
+      setResponse({
+        answer: `Hey! I'm your AI Research Copilot. Ask me anything about **${ticker}** — earnings, margins, revenue growth, valuation, news sentiment — and I'll pull live data and give you evidence-backed answers.`,
+        key_findings: [], claims: [], limitations: [], sources: [], calculations: [],
+        citation_validation_passed: true, citation_issues: [], session_id: '',
+      } as any);
+      setActiveTab('answer');
+      setQuestion('');
+      return;
+    }
+
     setLoading(true);
     setError(null);
     setResponse(null);
