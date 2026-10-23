@@ -1,21 +1,29 @@
 import React, { useState, useEffect } from 'react';
+import { colors, font, radius, cardStyle } from '../tokens';
 
 const SIGNALS = [
-  { text: 'NVDA Bullish Momentum Detected',  color: '#00ff9d', icon: '▲' },
-  { text: 'BTC Breakout Probability 81%',    color: '#00c8ff', icon: '⚡' },
-  { text: 'ETH Volume Surge +34%',           color: '#00ff9d', icon: '▲' },
-  { text: 'TSLA Trend Reversal Signal',      color: '#ffaa00', icon: '◈' },
-  { text: 'Market Fear Index Declining',     color: '#00ff9d', icon: '▲' },
-  { text: 'HSBA London LSE Breaking Out',    color: '#00c8ff', icon: '▲' },
-  { text: 'Gold Safe Haven Demand Rising',   color: '#ffaa00', icon: '◈' },
-  { text: 'SAP Frankfurt Strong Q2 2026',    color: '#00ff9d', icon: '▲' },
-  { text: 'RELIANCE NSE Momentum +2.1%',    color: '#00ff9d', icon: '▲' },
-  { text: 'USD/INR Forex Under Pressure',    color: '#ff0066', icon: '▼' },
-  { text: 'Nasdaq Strength Increasing',      color: '#00c8ff', icon: '▲' },
-  { text: 'Oil Supply Concerns Elevated',    color: '#ff0066', icon: '▼' },
-  { text: 'TCS NSE AI Division Growth',      color: '#00ff9d', icon: '▲' },
-  { text: 'SOL Solana +4.1% Volume Spike',   color: '#ff00ff', icon: '⚡' },
+  { text: 'NVDA Bullish Momentum Detected',  color: colors.green,  icon: '▲', dir: 'BUY' },
+  { text: 'BTC Breakout Probability 81%',    color: colors.teal,   icon: '⚡', dir: 'WATCH' },
+  { text: 'ETH Volume Surge +34%',           color: colors.green,  icon: '▲', dir: 'BUY' },
+  { text: 'TSLA Trend Reversal Signal',      color: colors.amber,  icon: '◈', dir: 'HOLD' },
+  { text: 'Market Fear Index Declining',     color: colors.green,  icon: '▲', dir: 'WATCH' },
+  { text: 'HSBA London LSE Breaking Out',    color: colors.teal,   icon: '▲', dir: 'BUY' },
+  { text: 'Gold Safe Haven Demand Rising',   color: colors.amber,  icon: '◈', dir: 'HOLD' },
+  { text: 'SAP Frankfurt Strong Q2 2026',    color: colors.green,  icon: '▲', dir: 'BUY' },
+  { text: 'RELIANCE NSE Momentum +2.1%',    color: colors.green,  icon: '▲', dir: 'BUY' },
+  { text: 'USD/INR Forex Under Pressure',    color: colors.red,    icon: '▼', dir: 'SELL' },
+  { text: 'Nasdaq Strength Increasing',      color: colors.teal,   icon: '▲', dir: 'WATCH' },
+  { text: 'Oil Supply Concerns Elevated',    color: colors.red,    icon: '▼', dir: 'SELL' },
+  { text: 'TCS NSE AI Division Growth',      color: colors.green,  icon: '▲', dir: 'BUY' },
+  { text: 'SOL Solana +4.1% Volume Spike',   color: colors.purple, icon: '⚡', dir: 'WATCH' },
 ];
+
+const DIR_COLOR: Record<string, string> = {
+  BUY:   colors.green,
+  SELL:  colors.red,
+  HOLD:  colors.amber,
+  WATCH: colors.teal,
+};
 
 const SignalFeed: React.FC = () => {
   const [visible, setVisible] = useState<number[]>([0, 1, 2, 3]);
@@ -25,96 +33,119 @@ const SignalFeed: React.FC = () => {
     const interval = setInterval(() => {
       setVisible(prev => [...prev.slice(-4), idx % SIGNALS.length]);
       setIdx(i => i + 1);
-    }, 2000);
+    }, 2500);
     return () => clearInterval(interval);
   }, [idx]);
 
   return (
     <div style={{
-      background: 'rgba(0,5,16,0.85)',
-      border: '1px solid rgba(0,255,157,0.2)',
-      borderRadius: '14px',
+      ...cardStyle,
       padding: '1rem',
-      backdropFilter: 'blur(20px)',
       position: 'relative',
       overflow: 'hidden',
     }}>
-      {/* Top gradient border */}
-      <div style={{
-        position: 'absolute', top: 0, left: 0, right: 0, height: '2px',
-        background: 'linear-gradient(90deg, transparent, #00ff9d, #ff00ff, transparent)',
-      }} />
-
       {/* Header */}
       <div style={{
-        fontFamily: "'Orbitron', monospace",
-        color: '#00ff9d',
-        fontSize: '0.7rem',
-        letterSpacing: '3px',
-        marginBottom: '0.8rem',
         display: 'flex',
         alignItems: 'center',
-        gap: '0.5rem',
+        justifyContent: 'space-between',
+        marginBottom: '0.7rem',
       }}>
-        <span style={{
-          width: '8px',
-          height: '8px',
-          borderRadius: '50%',
-          background: '#00ff9d',
-          boxShadow: '0 0 10px #00ff9d',
-          display: 'inline-block',
-          animation: 'livePulse 1s infinite',
-        }} />
-        ◈ LIVE AI SIGNALS
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: '0.5rem',
+          fontFamily: font.heading,
+          color: colors.textTeal,
+          fontSize: '0.65rem',
+          letterSpacing: '2px',
+        }}>
+          <span style={{
+            width: '7px', height: '7px',
+            borderRadius: '50%',
+            background: colors.amber,
+            boxShadow: `0 0 8px ${colors.amber}`,
+            display: 'inline-block',
+            animation: 'demoFlash 2s infinite',
+          }} />
+          SIGNAL MONITOR
+        </div>
+
+        {/* DEMO badge — clearly not live */}
+        <div style={{
+          background: `${colors.amber}18`,
+          border: `1px solid ${colors.amber}55`,
+          borderRadius: radius.pill,
+          padding: '0.1rem 0.6rem',
+          fontFamily: font.mono,
+          fontSize: '0.58rem',
+          color: colors.amber,
+          letterSpacing: '1px',
+        }}>
+          DEMO DATA · NOT REAL
+        </div>
       </div>
 
       {/* Signals */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
         {visible.map((sigIdx, i) => {
           const sig = SIGNALS[sigIdx % SIGNALS.length];
+          const dirColor = DIR_COLOR[sig.dir] || colors.teal;
           return (
             <div key={`${sigIdx}-${i}`} style={{
               display: 'flex',
               alignItems: 'center',
               gap: '0.5rem',
-              padding: '0.5rem 0.7rem',
-              background: `${sig.color}0d`,
-              border: `1px solid ${sig.color}44`,
-              borderRadius: '8px',
-              animation: i === visible.length - 1 ? 'slideIn 0.4s ease' : 'none',
-              fontFamily: "'Share Tech Mono', monospace",
-              fontSize: '0.73rem',
-              color: '#ffffff',
+              padding: '0.45rem 0.7rem',
+              background: `${sig.color}08`,
+              border: `1px solid ${sig.color}28`,
+              borderRadius: radius.sm,
+              animation: i === visible.length - 1 ? 'slideIn 0.35s ease' : 'none',
+              fontFamily: font.mono,
+              fontSize: '0.71rem',
+              color: colors.textPrimary,
               transition: 'all 0.3s',
             }}>
+              <span style={{ color: sig.color, fontSize: '0.8rem', minWidth: '14px' }}>
+                {sig.icon}
+              </span>
+              <span style={{ flex: 1 }}>{sig.text}</span>
               <span style={{
-                color: sig.color,
-                fontSize: '0.85rem',
-                textShadow: `0 0 8px ${sig.color}`,
-                minWidth: '16px',
-              }}>{sig.icon}</span>
-              <span>{sig.text}</span>
-              <span style={{
-                marginLeft: 'auto',
-                width: '6px',
-                height: '6px',
-                borderRadius: '50%',
-                background: sig.color,
-                boxShadow: `0 0 6px ${sig.color}`,
+                padding: '0.1rem 0.4rem',
+                background: `${dirColor}18`,
+                border: `1px solid ${dirColor}44`,
+                borderRadius: '4px',
+                fontSize: '0.6rem',
+                color: dirColor,
+                fontFamily: font.heading,
+                letterSpacing: '0.5px',
                 flexShrink: 0,
-              }} />
+              }}>
+                {sig.dir}
+              </span>
             </div>
           );
         })}
       </div>
 
+      {/* Disclaimer */}
+      <div style={{
+        marginTop: '0.6rem',
+        fontFamily: font.mono,
+        fontSize: '0.58rem',
+        color: colors.textDim,
+        lineHeight: 1.4,
+        borderTop: `1px solid ${colors.borderDim}`,
+        paddingTop: '0.5rem',
+      }}>
+        ⓘ Illustrative signals only — not generated by the live AI pipeline. Run an analysis above to get real recommendations.
+      </div>
+
       <style>{`
-        @keyframes livePulse {
-          0%,100% { opacity: 1; box-shadow: 0 0 10px #00ff9d; }
-          50%      { opacity: 0.3; box-shadow: none; }
+        @keyframes demoFlash {
+          0%,100% { opacity: 1; }
+          50%      { opacity: 0.4; }
         }
         @keyframes slideIn {
-          from { opacity: 0; transform: translateX(-12px); }
+          from { opacity: 0; transform: translateX(-10px); }
           to   { opacity: 1; transform: translateX(0); }
         }
       `}</style>

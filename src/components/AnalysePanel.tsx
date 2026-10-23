@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { jsPDF } from 'jspdf';
+import { colors, font, radius } from '../tokens';
 
 interface AnalysePanelProps {
   result: any;
@@ -219,7 +220,19 @@ const DataRow: React.FC<{ label: string; value: string; accent?: string }> = ({ 
   </div>
 );
 
+type ResearchTab = 'overview' | 'fundamentals' | 'valuation' | 'ai_report' | 'charts' | 'risk';
+
+const RESEARCH_TABS: { id: ResearchTab; label: string; icon: string }[] = [
+  { id: 'overview',     label: 'Overview',      icon: '◈' },
+  { id: 'fundamentals', label: 'Fundamentals',  icon: '📊' },
+  { id: 'valuation',    label: 'Valuation',     icon: '⚖' },
+  { id: 'ai_report',   label: 'AI Report',     icon: '🤖' },
+  { id: 'charts',      label: 'Charts',        icon: '📈' },
+  { id: 'risk',        label: 'Risk',          icon: '⚠' },
+];
+
 const AnalysePanel: React.FC<AnalysePanelProps> = ({ result, loading, agentStep, ticker }) => {
+  const [activeTab, setActiveTab] = useState<ResearchTab>('overview');
 
   if (loading) {
     return (
@@ -329,7 +342,46 @@ const AnalysePanel: React.FC<AnalysePanelProps> = ({ result, loading, agentStep,
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 
-      {/* TOP METRICS */}
+      {/* RESEARCH TABS */}
+      <div style={{
+        display: 'flex',
+        gap: '0.25rem',
+        background: 'rgba(0,8,22,0.7)',
+        border: `1px solid ${colors.border}`,
+        borderRadius: radius.md,
+        padding: '0.3rem',
+        backdropFilter: 'blur(16px)',
+        flexWrap: 'wrap',
+      }}>
+        {RESEARCH_TABS.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            style={{
+              background: activeTab === tab.id ? colors.bgActive : 'transparent',
+              border: `1px solid ${activeTab === tab.id ? colors.borderHi : 'transparent'}`,
+              borderRadius: '6px',
+              color: activeTab === tab.id ? colors.textTeal : colors.textDim,
+              fontFamily: font.mono,
+              fontSize: '0.72rem',
+              letterSpacing: '0.5px',
+              padding: '0.35rem 0.85rem',
+              cursor: 'pointer',
+              transition: 'all 0.18s',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.35rem',
+            }}
+            onMouseEnter={e => { if (activeTab !== tab.id) e.currentTarget.style.color = colors.textSecondary; }}
+            onMouseLeave={e => { if (activeTab !== tab.id) e.currentTarget.style.color = colors.textDim; }}
+          >
+            <span style={{ fontSize: '0.75rem' }}>{tab.icon}</span>
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* TOP METRICS — always visible */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '0.8rem' }}>
         <MetricCard label="Recommendation" value={rec}                                                         color={recColor}  big />
         <MetricCard label="Signal Score"   value={signal.score != null ? `${signal.score}/100` : 'N/A'}        color={signal.tier === 'strong_buy' || signal.tier === 'buy' ? '#00ff9d' : signal.tier === 'strong_sell' || signal.tier === 'sell' ? '#ff0066' : '#ffaa00'} />
@@ -339,8 +391,8 @@ const AnalysePanel: React.FC<AnalysePanelProps> = ({ result, loading, agentStep,
         <MetricCard label="24H Change"     value={fin.change_percent || 'N/A'}                                 color={(fin.change_percent || '').includes('-') ? '#ff0066' : '#00ff9d'} />
       </div>
 
-      {/* DCF VALUATION */}
-      <Panel>
+      {/* DCF VALUATION — valuation tab */}
+      {(activeTab === 'valuation' || activeTab === 'overview') && <Panel>
         <PanelTitle>◈ DCF Valuation · {valMethod} · {valHorizon}</PanelTitle>
 
         {valAvailable ? (
@@ -402,10 +454,10 @@ const AnalysePanel: React.FC<AnalysePanelProps> = ({ result, loading, agentStep,
             ⚠ Valuation unavailable — {valUnavailReason || 'insufficient data for this asset type'}
           </div>
         )}
-      </Panel>
+      </Panel>}
 
-      {/* RAG BADGE */}
-      <div style={{
+      {/* RAG BADGE — overview + ai_report */}
+      {(activeTab === 'overview' || activeTab === 'ai_report') && <div style={{
         background: 'rgba(0,200,255,0.06)',
         border: '1px solid rgba(0,200,255,0.25)',
         borderRadius: '10px',
@@ -419,10 +471,10 @@ const AnalysePanel: React.FC<AnalysePanelProps> = ({ result, loading, agentStep,
         <span style={{ fontFamily: "'Share Tech Mono',monospace", fontSize: '0.75rem', color: '#fff' }}>📦 Embeddings: <b style={{ color: '#00c8ff' }}>{rag.total_stored || 0}</b></span>
         <span style={{ fontFamily: "'Share Tech Mono',monospace", fontSize: '0.75rem', color: '#fff' }}>✨ Fresh: <b style={{ color: '#00c8ff' }}>{rag.freshly_stored || 0}</b></span>
         {report.rag_insight && <span style={{ fontFamily: "'Share Tech Mono',monospace", fontSize: '0.7rem', color: 'rgba(255,255,255,0.6)' }}>💡 {report.rag_insight}</span>}
-      </div>
+      </div>}
 
-      {/* MARKET DATA + FUNDAMENTALS */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+      {/* MARKET DATA + FUNDAMENTALS — fundamentals + overview tabs */}
+      {(activeTab === 'fundamentals' || activeTab === 'overview') && <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
         <Panel>
           <PanelTitle>◈ Market Data</PanelTitle>
           <DataRow label="ASSET"    value={fin.company_name || ticker} />
@@ -456,10 +508,10 @@ const AnalysePanel: React.FC<AnalysePanelProps> = ({ result, loading, agentStep,
           <DataRow label="TOTAL DEBT"    value={fin.total_debt        || 'N/A'} accent="#ff6644" />
           <DataRow label="DIV YIELD"     value={fin.dividend_yield    || 'N/A'} />
         </Panel>
-      </div>
+      </div>}
 
-      {/* 10-YEAR FINANCIALS */}
-      {histFin.available && (
+      {/* 10-YEAR FINANCIALS — fundamentals tab only */}
+      {histFin.available && (activeTab === 'fundamentals' || activeTab === 'overview') && (
         <Panel>
           <PanelTitle>◈ 10-Year Financial Statements · {histFin.symbol} · {histFin.years_available} years</PanelTitle>
 
@@ -530,8 +582,8 @@ const AnalysePanel: React.FC<AnalysePanelProps> = ({ result, loading, agentStep,
         </Panel>
       )}
 
-      {/* AI REPORT */}
-      <Panel>
+      {/* AI REPORT — ai_report + overview tabs */}
+      {(activeTab === 'ai_report' || activeTab === 'overview') && <Panel>
         <PanelTitle>◈ AI Intelligence Report</PanelTitle>
         <div style={{
           fontFamily: "'Share Tech Mono',monospace",
@@ -568,10 +620,10 @@ const AnalysePanel: React.FC<AnalysePanelProps> = ({ result, loading, agentStep,
             }}>⚠ {r}</div>
           ))}
         </div>
-      </Panel>
+      </Panel>}
 
-      {/* CHARTS */}
-      <Panel>
+      {/* CHARTS — charts + overview tabs */}
+      {(activeTab === 'charts' || activeTab === 'overview') && <Panel>
         <PanelTitle>◈ Price History — {ticker} · 30 Days</PanelTitle>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
           <div>
@@ -606,10 +658,10 @@ const AnalysePanel: React.FC<AnalysePanelProps> = ({ result, loading, agentStep,
             )}
           </div>
         </div>
-      </Panel>
+      </Panel>}
 
-      {/* SENTIMENT */}
-      <Panel>
+      {/* SENTIMENT — overview + ai_report */}
+      {(activeTab === 'overview' || activeTab === 'ai_report') && <Panel>
         <PanelTitle>◈ Sentiment Signal</PanelTitle>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -634,7 +686,26 @@ const AnalysePanel: React.FC<AnalysePanelProps> = ({ result, loading, agentStep,
             {sentiment.summary || ''}
           </div>
         </div>
-      </Panel>
+      </Panel>}
+
+      {/* RISK — risk + overview */}
+      {(activeTab === 'risk' || activeTab === 'overview') && (report.risks || []).length > 0 && <Panel>
+        <PanelTitle>◈ Risk Vectors</PanelTitle>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
+          {(report.risks || []).map((r: string, i: number) => (
+            <div key={i} style={{
+              background: 'rgba(255,0,102,0.08)',
+              border: '1px solid rgba(255,0,102,0.3)',
+              borderRadius: '8px',
+              padding: '0.5rem 0.7rem',
+              fontFamily: "'Share Tech Mono',monospace",
+              color: '#ff6699',
+              fontSize: '0.73rem',
+              lineHeight: 1.5,
+            }}>⚠ {r}</div>
+          ))}
+        </div>
+      </Panel>}
 
       {/* EXPORT BUTTONS */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>

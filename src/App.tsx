@@ -1,22 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import SpaceBackground from './components/SpaceBackground';
-import Hero from './components/Hero';
 import TickerTape from './components/TickerTape';
+import TopNav from './components/TopNav';
 import AnalysePanel from './components/AnalysePanel';
 import NewsPanel from './components/NewsPanel';
 import SignalFeed from './components/SignalFeed';
+import { colors, font } from './tokens';
 import './App.css';
 
 const API = 'https://finagent-api-k9em.onrender.com';
 
 const App: React.FC = () => {
-  const [ticker, setTicker]         = useState('NVDA');
-  const [market, setMarket]         = useState('US');
-  const [result, setResult]         = useState<any>(null);
-  const [loading, setLoading]       = useState(false);
-  const [agentStep, setAgentStep]   = useState(0);
+  const [ticker, setTicker]           = useState('NVDA');
+  const [market, setMarket]           = useState('US');
+  const [result, setResult]           = useState<any>(null);
+  const [loading, setLoading]         = useState(false);
+  const [agentStep, setAgentStep]     = useState(0);
   const [generalNews, setGeneralNews] = useState<any[]>([]);
-  const [stockNews, setStockNews]   = useState<any[]>([]);
+  const [stockNews, setStockNews]     = useState<any[]>([]);
 
   useEffect(() => {
     fetch(`${API}/news/general`)
@@ -57,35 +58,78 @@ const App: React.FC = () => {
   return (
     <>
       <SpaceBackground />
+
+      {/* Sticky compact nav — replaces the giant Hero */}
+      <TopNav
+        ticker={ticker}
+        setTicker={setTicker}
+        market={market}
+        setMarket={setMarket}
+        onAnalyse={handleAnalyse}
+        loading={loading}
+      />
+
+      {/* Scrolling ticker tape */}
       <TickerTape />
-      <div style={{ position: 'relative', zIndex: 10, maxWidth: '1400px', margin: '0 auto', padding: '0 1.5rem' }}>
-        <Hero
-          ticker={ticker}
-          setTicker={setTicker}
-          market={market}
-          setMarket={setMarket}
-          onAnalyse={handleAnalyse}
-          loading={loading}
-        />
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '1.5rem', marginTop: '1rem' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <AnalysePanel result={result} loading={loading} agentStep={agentStep} ticker={ticker} />
+
+      {/* Main content */}
+      <div style={{
+        position: 'relative',
+        zIndex: 10,
+        maxWidth: '1560px',
+        margin: '0 auto',
+        padding: '1rem 1.2rem',
+      }}>
+        {/* Two-column layout: left = analysis, right = signals + news */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr minmax(300px, 380px)',
+          gap: '1.2rem',
+          alignItems: 'start',
+        }}>
+          {/* Left — main research panel */}
+          <div>
+            <AnalysePanel
+              result={result}
+              loading={loading}
+              agentStep={agentStep}
+              ticker={ticker}
+            />
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+
+          {/* Right — sidebar */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', position: 'sticky', top: '68px' }}>
             <SignalFeed />
             <NewsPanel generalNews={generalNews} stockNews={stockNews} ticker={ticker} />
           </div>
         </div>
+
+        {/* Footer */}
         <div style={{
           marginTop: '2rem',
-          padding: '1rem',
-          textAlign: 'center',
-          borderTop: '1px solid rgba(0,255,157,0.1)',
-          fontFamily: "'Share Tech Mono', monospace",
-          fontSize: '0.6rem',
-          color: 'rgba(0,255,157,0.3)',
+          padding: '0.8rem 1rem',
+          borderTop: `1px solid ${colors.border}`,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '0.5rem',
         }}>
-          ⬡ FINAGENT GLOBAL · LANGGRAPH · GROQ · TAVILY · CHROMADB · RAG · NOT FINANCIAL ADVICE ⬡
+          <span style={{
+            fontFamily: font.mono,
+            fontSize: '0.6rem',
+            color: colors.textDim,
+            letterSpacing: '0.5px',
+          }}>
+            ◈ FINAGENT GLOBAL · LangGraph · Groq · Tavily · ChromaDB · RAG
+          </span>
+          <span style={{
+            fontFamily: font.mono,
+            fontSize: '0.6rem',
+            color: colors.textDim,
+          }}>
+            NOT FINANCIAL ADVICE — For informational purposes only
+          </span>
         </div>
       </div>
     </>
