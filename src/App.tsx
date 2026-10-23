@@ -5,6 +5,7 @@ import TopNav from './components/TopNav';
 import AnalysePanel from './components/AnalysePanel';
 import NewsPanel from './components/NewsPanel';
 import SignalFeed from './components/SignalFeed';
+import CopilotPanel from './components/CopilotPanel';
 import { colors, font } from './tokens';
 import './App.css';
 
@@ -88,7 +89,7 @@ const App: React.FC = () => {
           alignItems: 'start',
         }}>
           {/* Left — main research panel */}
-          <div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
             <AnalysePanel
               result={result}
               loading={loading}
@@ -96,6 +97,7 @@ const App: React.FC = () => {
               ticker={ticker}
               generalNews={generalNews}
             />
+            <CopilotPanel ticker={ticker} market={market} />
           </div>
 
           {/* Right — sidebar */}
