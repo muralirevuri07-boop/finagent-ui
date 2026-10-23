@@ -96,6 +96,8 @@ const App: React.FC = () => {
               agentStep={agentStep}
               ticker={ticker}
               generalNews={generalNews}
+              onSetTicker={setTicker}
+              onSetMarket={setMarket}
             />
             <CopilotPanel ticker={ticker} market={market} />
           </div>

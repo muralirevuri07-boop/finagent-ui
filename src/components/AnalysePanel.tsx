@@ -16,6 +16,8 @@ interface AnalysePanelProps {
   agentStep: number;
   ticker: string;
   generalNews?: NewsItem[];
+  onSetTicker?: (ticker: string) => void;
+  onSetMarket?: (market: string) => void;
 }
 
 const AGENTS = [
@@ -303,7 +305,7 @@ const VolumeTooltip = ({ active, payload, label }: any) => {
   );
 };
 
-const AnalysePanel: React.FC<AnalysePanelProps> = ({ result, loading, agentStep, ticker, generalNews = [] }) => {
+const AnalysePanel: React.FC<AnalysePanelProps> = ({ result, loading, agentStep, ticker, generalNews = [], onSetTicker, onSetMarket }) => {
   const [activeTab, setActiveTab] = useState<ResearchTab>('overview');
 
   // ── LOADING STATE ─────────────────────────────────────────────────────────
@@ -395,7 +397,7 @@ const AnalysePanel: React.FC<AnalysePanelProps> = ({ result, loading, agentStep,
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem' }}>
                   {cat.tickers.map(t => (
-                    <span key={t} style={{
+                    <button key={t} onClick={() => { onSetTicker?.(t); onSetMarket?.(cat.market); }} style={{
                       background: `${cat.color}11`,
                       border: `1px solid ${cat.color}33`,
                       borderRadius: radius.pill,
@@ -403,7 +405,8 @@ const AnalysePanel: React.FC<AnalysePanelProps> = ({ result, loading, agentStep,
                       fontFamily: font.mono,
                       fontSize: '0.68rem',
                       color: `${cat.color}cc`,
-                    }}>{t}</span>
+                      cursor: 'pointer',
+                    }}>{t}</button>
                   ))}
                 </div>
               </div>
