@@ -25,12 +25,48 @@ const FinTable: React.FC<{
   rows: any[];
   cols: { key: string; label: string; accent?: string }[];
 }> = ({ title, rows, cols }) => {
+  const [yearFilter, setYearFilter] = React.useState<2 | 5 | 10>(10);
   if (!rows || rows.length === 0) return null;
-  const sorted = [...rows].sort((a, b) => String(a.year).localeCompare(String(b.year)));
+  const sorted = [...rows].sort((a, b) => String(b.year).localeCompare(String(a.year)));
+  const filtered = sorted.slice(0, yearFilter);
+  const displayRows = [...filtered].reverse();
+
+  const btnBase: React.CSSProperties = {
+    fontFamily: "'Share Tech Mono',monospace",
+    fontSize: '0.62rem',
+    letterSpacing: '1px',
+    padding: '0.2rem 0.55rem',
+    border: '1px solid rgba(0,200,255,0.25)',
+    borderRadius: '3px',
+    cursor: 'pointer',
+    transition: 'all 0.15s',
+    marginLeft: '0.35rem',
+  };
+
   return (
-    <div style={{ marginBottom: '1.2rem', overflowX: 'auto' }}>
-      <div style={{ fontFamily: "'Share Tech Mono',monospace", fontSize: '0.65rem', color: 'rgba(0,200,255,0.6)', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
-        {title}
+    <div style={{ marginBottom: '1.4rem', overflowX: 'auto' }}>
+      {/* Header row with title + year filter buttons */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+        <div style={{ fontFamily: "'Share Tech Mono',monospace", fontSize: '0.65rem', color: 'rgba(0,200,255,0.6)', letterSpacing: '2px', textTransform: 'uppercase' }}>
+          {title}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <span style={{ fontFamily: "'Share Tech Mono',monospace", fontSize: '0.58rem', color: 'rgba(255,255,255,0.35)', marginRight: '0.25rem' }}>SHOW</span>
+          {([2, 5, 10] as const).map(y => (
+            <button
+              key={y}
+              onClick={() => setYearFilter(y)}
+              style={{
+                ...btnBase,
+                background: yearFilter === y ? 'rgba(0,200,255,0.18)' : 'rgba(0,200,255,0.04)',
+                color: yearFilter === y ? '#00c8ff' : 'rgba(255,255,255,0.4)',
+                borderColor: yearFilter === y ? 'rgba(0,200,255,0.55)' : 'rgba(0,200,255,0.15)',
+              }}
+            >
+              {y}Y
+            </button>
+          ))}
+        </div>
       </div>
       <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
         <thead>
@@ -40,7 +76,7 @@ const FinTable: React.FC<{
           </tr>
         </thead>
         <tbody>
-          {sorted.map((row, i) => (
+          {displayRows.map((row, i) => (
             <tr key={i} style={{ background: i % 2 === 0 ? 'rgba(0,200,255,0.03)' : 'transparent' }}>
               <td style={{ ...tdStyle, color: '#00c8ff', fontWeight: 'bold' }}>{row.year}</td>
               {cols.map(c => (
