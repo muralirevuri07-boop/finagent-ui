@@ -94,6 +94,7 @@ const App: React.FC = () => {
               loading={loading}
               agentStep={agentStep}
               ticker={ticker}
+              generalNews={generalNews}
             />
           </div>
 

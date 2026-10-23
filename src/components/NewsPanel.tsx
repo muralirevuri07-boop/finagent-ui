@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface NewsItem {
   title: string;
@@ -15,6 +15,11 @@ interface NewsPanelProps {
 
 const NewsPanel: React.FC<NewsPanelProps> = ({ generalNews, stockNews, ticker }) => {
   const [tab, setTab] = useState<'global' | 'stock'>('global');
+
+  // Auto-switch to stock tab when stock news arrives after an analysis
+  useEffect(() => {
+    if (stockNews.length > 0) setTab('stock');
+  }, [stockNews.length]);
   const news = tab === 'global' ? generalNews : stockNews;
 
   return (
