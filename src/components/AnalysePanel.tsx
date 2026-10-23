@@ -13,10 +13,67 @@ const AGENTS = [
   { name: 'NEWS AGENT',      icon: '📰', desc: 'Scraping live market news via Tavily' },
   { name: 'RAG MEMORY',      icon: '🧠', desc: 'Retrieving historical context from ChromaDB' },
   { name: 'FINANCIAL DATA',  icon: '📊', desc: 'Fetching live price & fundamentals' },
+  { name: 'HIST FINANCIALS', icon: '📂', desc: 'Loading 10-year financials via FMP' },
   { name: 'SENTIMENT AI',    icon: '💭', desc: 'Analysing market sentiment via Groq LLM' },
   { name: 'REPORT GEN',      icon: '📋', desc: 'Generating institutional-grade report' },
   { name: 'FINAL DECISION',  icon: '⚡', desc: 'Compiling AI recommendation' },
 ];
+
+// ── 10-year financials table ──────────────────────────────────────────────────
+const FinTable: React.FC<{
+  title: string;
+  rows: any[];
+  cols: { key: string; label: string; accent?: string }[];
+}> = ({ title, rows, cols }) => {
+  if (!rows || rows.length === 0) return null;
+  const sorted = [...rows].sort((a, b) => String(a.year).localeCompare(String(b.year)));
+  return (
+    <div style={{ marginBottom: '1.2rem', overflowX: 'auto' }}>
+      <div style={{ fontFamily: "'Share Tech Mono',monospace", fontSize: '0.65rem', color: 'rgba(0,200,255,0.6)', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+        {title}
+      </div>
+      <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
+        <thead>
+          <tr>
+            <th style={thStyle}>Year</th>
+            {cols.map(c => <th key={c.key} style={thStyle}>{c.label}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {sorted.map((row, i) => (
+            <tr key={i} style={{ background: i % 2 === 0 ? 'rgba(0,200,255,0.03)' : 'transparent' }}>
+              <td style={{ ...tdStyle, color: '#00c8ff', fontWeight: 'bold' }}>{row.year}</td>
+              {cols.map(c => (
+                <td key={c.key} style={{ ...tdStyle, color: c.accent || '#e0e8ff' }}>
+                  {row[c.key] ?? 'N/A'}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+const thStyle: React.CSSProperties = {
+  fontFamily: "'Share Tech Mono',monospace",
+  fontSize: '0.62rem',
+  color: 'rgba(0,255,157,0.5)',
+  letterSpacing: '1px',
+  textTransform: 'uppercase',
+  padding: '0.4rem 0.6rem',
+  borderBottom: '1px solid rgba(0,255,157,0.15)',
+  textAlign: 'right',
+  whiteSpace: 'nowrap',
+};
+const tdStyle: React.CSSProperties = {
+  fontFamily: "'Share Tech Mono',monospace",
+  fontSize: '0.78rem',
+  padding: '0.35rem 0.6rem',
+  borderBottom: '1px solid rgba(255,255,255,0.04)',
+  textAlign: 'right',
+};
 
 const Panel: React.FC<{ children: React.ReactNode; style?: React.CSSProperties }> = ({ children, style }) => (
   <div style={{
@@ -199,12 +256,13 @@ const AnalysePanel: React.FC<AnalysePanelProps> = ({ result, loading, agentStep,
     );
   }
 
-  const report    = result.report         || {};
-  const sentiment = result.sentiment      || {};
-  const fin       = result.financial_data || {};
-  const rag       = result.rag_context    || {};
-  const valuation = result.valuation      || {};
-  const signal    = result.signal         || {};
+  const report    = result.report                 || {};
+  const sentiment = result.sentiment              || {};
+  const fin       = result.financial_data         || {};
+  const rag       = result.rag_context            || {};
+  const valuation = result.valuation              || {};
+  const signal    = result.signal                 || {};
+  const histFin   = result.historical_financials  || {};
   const rec       = report.recommendation || 'N/A';
   const currency  = fin.currency || '$';
   const recColor  = rec === 'BUY' ? '#00ff9d' : rec === 'SELL' ? '#ff0066' : '#ffaa00';
@@ -363,6 +421,78 @@ const AnalysePanel: React.FC<AnalysePanelProps> = ({ result, loading, agentStep,
           <DataRow label="DIV YIELD"     value={fin.dividend_yield    || 'N/A'} />
         </Panel>
       </div>
+
+      {/* 10-YEAR FINANCIALS */}
+      {histFin.available && (
+        <Panel>
+          <PanelTitle>◈ 10-Year Financial Statements · {histFin.symbol} · {histFin.years_available} years</PanelTitle>
+
+          {/* Trend badges */}
+          {histFin.trends && Object.keys(histFin.trends).length > 0 && (
+            <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
+              {Object.entries(histFin.trends).map(([k, v]) => {
+                const up = String(v).startsWith('↑') || String(v).startsWith('+');
+                const color = up ? '#00ff9d' : '#ff6644';
+                return (
+                  <div key={k} style={{
+                    background: `${color}11`,
+                    border: `1px solid ${color}44`,
+                    borderRadius: '20px',
+                    padding: '0.25rem 0.75rem',
+                    fontFamily: "'Share Tech Mono',monospace",
+                    fontSize: '0.7rem',
+                    color,
+                  }}>
+                    {k.replace(/_/g,' ').toUpperCase()}: <b>{String(v)}</b>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          <FinTable
+            title="Income Statement"
+            rows={histFin.income_statement || []}
+            cols={[
+              { key: 'revenue',          label: 'Revenue' },
+              { key: 'gross_profit',     label: 'Gross Profit', accent: '#00ff9d' },
+              { key: 'operating_income', label: 'Op Income',    accent: '#00c8ff' },
+              { key: 'net_income',       label: 'Net Income',   accent: '#00ff9d' },
+              { key: 'ebitda',           label: 'EBITDA' },
+              { key: 'eps',              label: 'EPS',          accent: '#00c8ff' },
+              { key: 'gross_margin',     label: 'Gross %',      accent: '#00ff9d' },
+              { key: 'op_margin',        label: 'Op %',         accent: '#00c8ff' },
+              { key: 'net_margin',       label: 'Net %',        accent: '#00c8ff' },
+            ]}
+          />
+
+          <FinTable
+            title="Balance Sheet"
+            rows={histFin.balance_sheet || []}
+            cols={[
+              { key: 'total_assets',      label: 'Total Assets' },
+              { key: 'total_liabilities', label: 'Liabilities',  accent: '#ff6644' },
+              { key: 'total_equity',      label: 'Equity',       accent: '#00ff9d' },
+              { key: 'cash',              label: 'Cash',         accent: '#00ff9d' },
+              { key: 'total_debt',        label: 'Total Debt',   accent: '#ff6644' },
+              { key: 'net_debt',          label: 'Net Debt',     accent: '#ff6644' },
+              { key: 'book_value_share',  label: 'BV/Share',     accent: '#00c8ff' },
+            ]}
+          />
+
+          <FinTable
+            title="Cash Flow"
+            rows={histFin.cash_flow || []}
+            cols={[
+              { key: 'operating_cf',   label: 'Op CF',       accent: '#00c8ff' },
+              { key: 'capex',          label: 'CapEx',       accent: '#ff6644' },
+              { key: 'free_cashflow',  label: 'Free CF',     accent: '#00ff9d' },
+              { key: 'dividends_paid', label: 'Dividends',   accent: '#ffaa00' },
+              { key: 'share_buybacks', label: 'Buybacks',    accent: '#ffaa00' },
+            ]}
+          />
+        </Panel>
+      )}
 
       {/* AI REPORT */}
       <Panel>
