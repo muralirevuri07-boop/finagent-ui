@@ -12,7 +12,7 @@
  */
 
 import React, { useState, useRef, useCallback } from 'react';
-import { colors, font, radius, space, cardStyle } from '../tokens';
+import { colors, font, radius, cardStyle } from '../tokens';
 
 const API = 'https://finagent-api-k9em.onrender.com';
 
