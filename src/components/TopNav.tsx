@@ -89,9 +89,9 @@ const TopNav: React.FC<TopNavProps> = ({ ticker, setTicker, market, setMarket, o
         margin: '0 auto',
       }}>
         {/* Logo */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0, minWidth: '170px', overflow: 'visible' }}>
           <div style={{
-            width: '28px', height: '28px',
+            width: '28px', height: '28px', flexShrink: 0,
             background: `linear-gradient(135deg, ${colors.teal}22, ${colors.green}22)`,
             border: `1px solid ${colors.teal}55`,
             borderRadius: '7px',
@@ -104,6 +104,7 @@ const TopNav: React.FC<TopNavProps> = ({ ticker, setTicker, market, setMarket, o
             fontWeight: 700,
             letterSpacing: '2px',
             color: colors.textPrimary,
+            whiteSpace: 'nowrap',
           }}>FINAGENT</span>
           <span style={{
             fontFamily: font.heading,
@@ -111,6 +112,7 @@ const TopNav: React.FC<TopNavProps> = ({ ticker, setTicker, market, setMarket, o
             color: colors.textTeal,
             letterSpacing: '1px',
             opacity: 0.8,
+            whiteSpace: 'nowrap',
           }}>GLOBAL</span>
         </div>
 

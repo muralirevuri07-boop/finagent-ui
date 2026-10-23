@@ -605,21 +605,6 @@ const AnalysePanel: React.FC<AnalysePanelProps> = ({ result, loading, agentStep,
           paddingLeft: '1rem',
           marginBottom: '1rem',
         }}>{report.news_summary || 'N/A'}</div>
-
-        <PanelTitle>◈ Risk Vectors</PanelTitle>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
-          {(report.risks || []).map((r: string, i: number) => (
-            <div key={i} style={{
-              background: 'rgba(255,0,102,0.08)',
-              border: '1px solid rgba(255,0,102,0.3)',
-              borderRadius: '8px',
-              padding: '0.4rem 0.6rem',
-              fontFamily: "'Share Tech Mono',monospace",
-              color: '#ff6699',
-              fontSize: '0.72rem',
-            }}>⚠ {r}</div>
-          ))}
-        </div>
       </Panel>}
 
       {/* CHARTS — charts + overview tabs */}
