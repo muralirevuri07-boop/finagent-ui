@@ -6,6 +6,7 @@ import AnalysePanel from './components/AnalysePanel';
 import NewsPanel from './components/NewsPanel';
 import SignalFeed from './components/SignalFeed';
 import CopilotPanel from './components/CopilotPanel';
+import PortfolioPanel from './components/PortfolioPanel';
 import { colors, font } from './tokens';
 import './App.css';
 
@@ -100,6 +101,7 @@ const App: React.FC = () => {
               onSetMarket={setMarket}
             />
             <CopilotPanel ticker={ticker} market={market} />
+            <PortfolioPanel />
           </div>
 
           {/* Right — sidebar */}
