@@ -406,6 +406,9 @@ const AnalysePanel: React.FC<AnalysePanelProps> = ({ result, loading, agentStep,
                       fontSize: '0.68rem',
                       color: `${cat.color}cc`,
                       cursor: 'pointer',
+                      outline: 'none',
+                      appearance: 'none',
+                      WebkitAppearance: 'none',
                     }}>{t}</button>
                   ))}
                 </div>
